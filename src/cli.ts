@@ -19,7 +19,7 @@ program
       const results = await crawl(url, [globalUrl]);
 
       console.log('Converting format...');
-      const yamlData = yaml.stringify(results.map(({ title, markdown }) => ({ title, content: markdown })));
+      const yamlData = yaml.stringify(results.map(({ title, url, markdown }) => ({ url, title, content: markdown })));
 
       // Check and ensure file path ends with .yaml
       const outputWithExt = output.endsWith('.yaml') ? output : `${output}.yaml`;
