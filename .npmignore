@@ -40,7 +40,7 @@ npm-debug.log*
 # Documentation
 docs/
 *.md
-!README.md
+!README*.md
 
 # Misc
 .DS_Store

@@ -1,17 +1,51 @@
 {
   "name": "md-crawler",
   "version": "1.0.0",
+  "description": "A powerful web crawler that extracts content from web pages and converts them to clean Markdown format, with support for code blocks and GitHub Flavored Markdown",
   "main": "dist/index.js",
   "bin": {
     "md-crawler": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc && chmod +x ./dist/cli.js",
-    "pub": "npm version patch && npm publish --access public"
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "test": "echo \"No tests specified yet\" && exit 0",
+    "lint": "tsc --noEmit",
+    "pub": "npm run test && npm run build && npm version patch && npm publish --access public"
   },
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "files": [
+    "dist",
+    "README.md",
+    "README-*.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "web-crawler",
+    "markdown",
+    "html-to-markdown",
+    "readability",
+    "content-extraction",
+    "playwright",
+    "cli-tool",
+    "web-scraping",
+    "gfm",
+    "turndown"
+  ],
+  "author": "gkctou@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gkctou/md-crawler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gkctou/md-crawler/issues"
+  },
+  "homepage": "https://github.com/gkctou/md-crawler#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "devDependencies": {
     "@types/node": "^22.10.1",
     "typescript": "^5.7.2"
