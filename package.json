@@ -1,6 +1,6 @@
 {
   "name": "md-crawler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A powerful web crawler that extracts content from web pages and converts them to clean Markdown format, with support for code blocks and GitHub Flavored Markdown",
   "main": "dist/index.js",
   "bin": {
