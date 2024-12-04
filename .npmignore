@@ -1,0 +1,47 @@
+# Source
+src/
+tests/
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Config files
+tsconfig.json
+.prettierrc
+.eslintrc
+.eslintignore
+.editorconfig
+durable-objects.yaml
+
+# Git related
+.git/
+.gitignore
+.github/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Development/Debug
+storage/
+node_modules/
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env*
+!.env.example
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Misc
+.DS_Store
+Thumbs.db
