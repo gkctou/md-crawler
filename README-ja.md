@@ -29,23 +29,17 @@ AI読解に最適化されたウェブクローラーツールで、ウェブコ
 - 🎯 人間の読解とAI処理の両方に適したMarkdown形式を生成
 - 🔍 大量の関連コンテンツの迅速な閲覧と検索が可能
 
-## インストール
-
-```bash
-npm install -g md-crawler
-```
-
 ## 使用方法
 
 ```bash
 # 基本的な使用法
-md-crawler <URL> <出力ファイル名>
+npx markdown-crawler <URL> <出力ファイル名>
 
 # 例：ウェブサイトをクロールしoutput.yamlとして保存
-md-crawler https://example.com output
+npx markdown-crawler https://example.com output
 
 # スペースを含むURLには二重引用符を使用
-md-crawler "https://example.com/my page" output
+npx markdown-crawler "https://example.com/my page" output
 
 # 出力ファイルには自動的に.yaml拡張子が追加されます
 # 結果は現在の作業ディレクトリに保存されます

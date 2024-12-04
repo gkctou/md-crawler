@@ -31,7 +31,17 @@
     "cli-tool",
     "web-scraping",
     "gfm",
-    "turndown"
+    "turndown",
+    "ai",
+    "llm",
+    "ai-content",
+    "ai-processing",
+    "machine-learning",
+    "nlp",
+    "text-extraction",
+    "semantic-content",
+    "structured-data",
+    "clean-text"
   ],
   "author": "gkctou@gmail.com",
   "license": "MIT",

@@ -29,23 +29,17 @@
 - 🎯 產生的 Markdown 格式同時適合人類閱讀和 AI 處理
 - 🔍 便於快速瀏覽和搜尋大量相關內容
 
-## 安裝
-
-```bash
-npm install -g md-crawler
-```
-
 ## 使用方法
 
 ```bash
 # 基本用法
-md-crawler <網址> <輸出檔案名稱>
+npx markdown-crawler <網址> <輸出檔案名稱>
 
 # 範例：爬取網站並儲存為 output.yaml
-md-crawler https://example.com output
+npx markdown-crawler https://example.com output
 
 # 如果網址包含空格，請使用雙引號
-md-crawler "https://example.com/my page" output
+npx markdown-crawler "https://example.com/my page" output
 
 # 輸出檔案會自動加上 .yaml 副檔名
 # 結果會儲存在目前的工作目錄中

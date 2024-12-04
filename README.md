@@ -29,23 +29,17 @@ A web crawler tool optimized for AI reading that converts web content into struc
 - 🎯 Generates Markdown format suitable for both human reading and AI processing
 - 🔍 Facilitates quick browsing and searching of large amounts of related content
 
-## Installation
-
-```bash
-npm install -g md-crawler
-```
-
 ## Usage
 
 ```bash
 # Basic usage
-md-crawler <url> <output-filename>
+npx markdown-crawler <url> <output-filename>
 
 # Example: Crawl website and save as output.yaml
-md-crawler https://example.com output
+npx markdown-crawler https://example.com output
 
 # For URLs with spaces, use double quotes
-md-crawler "https://example.com/my page" output
+npx markdown-crawler "https://example.com/my page" output
 
 # Output file will automatically add .yaml extension
 # Results will be saved in the current working directory
