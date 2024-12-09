@@ -9,7 +9,7 @@ export interface IPage {
   html: string;
   at: number;
 }
-export async function crawl(url: string, additionalGlobalUrls: string[] = [], headless: boolean = true,): Promise<IPage[]> {//output: any,
+export async function crawl(url: string, additionalGlobalUrls: string[] = [],waiting: number = 0, headless: boolean = true,): Promise<IPage[]> {//output: any,
   // PlaywrightCrawler crawls the web using a headless
   // browser controlled by the Playwright library.
   const pages: IPage[] = [];
@@ -23,6 +23,7 @@ export async function crawl(url: string, additionalGlobalUrls: string[] = [], he
     },
     // Use the requestHandler to process each of the crawled pages.
     async requestHandler({ request, page, response, enqueueLinks, log }) {
+      await page.waitForTimeout(waiting);
       if (!await response?.ok()) {
         log.error(`Got ${response?.status()} for ${request.loadedUrl}`)
         return;
