@@ -12,16 +12,19 @@ program
   .description('Crawl web pages and convert to YAML format Markdown. Will recursively crawl all pages in subdirectories.')
   .argument('<url>', 'URL to crawl. For URLs containing spaces, wrap them in double quotes: "http://example.com/my page"')
   .argument('<output>', 'Output YAML file name. Will be saved in the current working directory.')
-  .argument('<waiting>', 'Waiting time in milliseconds. Default is 0 milliseconds. If you get nothing foe some SPA web pages, recommended to set a waiting time about 500 milliseconds.')
-  .action(async (url: string, output: string, waiting: string) => {
+  .argument('[waiting]', 'Optional: Waiting time in milliseconds. Default is 0 milliseconds. If you get nothing for some SPA web pages, recommended to set a waiting time about 500 milliseconds.')
+  .action(async (url: string, output: string, waiting?: string) => {
     try {
       const waitingTime = parseInt(waiting || '0');
       if (isNaN(waitingTime)) {
         throw new Error('Waiting time must be a number.');
       }
       console.log('Starting web crawl...');
-      const globalUrl = url.endsWith('/') ? `${url}**/*` : `${url.substring(0, url.lastIndexOf('/'))}/**/*`;
-      const results = await crawl(url, [globalUrl], waitingTime);
+      const additionalGlobalUrls = [url.endsWith('/') ? `${url}**/*` : `${url.substring(0, url.lastIndexOf('/'))}/**/*`];
+      if (waitingTime > 0) {
+        additionalGlobalUrls.push(`#**/*`);
+      }
+      const results = await crawl(url, additionalGlobalUrls, waitingTime);
 
       console.log('Converting format...');
       const yamlData = yaml.stringify(results.map(({ title, url, markdown }) => ({ url, title, content: markdown })));
