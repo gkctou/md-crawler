@@ -21,9 +21,7 @@ program
       }
       console.log('Starting web crawl...');
       const additionalGlobalUrls = [url.endsWith('/') ? `${url}**/*` : `${url.substring(0, url.lastIndexOf('/'))}/**/*`];
-      // if (waitingTime > 0) {
-      //   additionalGlobalUrls.push(`#**/*`);
-      // }
+      console.log('additionalGlobalUrls:', additionalGlobalUrls);
       const results = await crawl(url, additionalGlobalUrls, waitingTime);
 
       console.log('Converting format...');

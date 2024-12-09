@@ -13,7 +13,8 @@
     "prebuild": "npm run clean",
     "test": "echo \"No tests specified yet\" && exit 0",
     "lint": "tsc --noEmit",
-    "pub": "npm run test && npm run build && npm version patch && npm publish --access public"
+    "prepub": "npm version patch",
+    "pub": "npm publish --access public"
   },
   "files": [
     "dist",
