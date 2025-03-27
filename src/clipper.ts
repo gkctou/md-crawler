@@ -3,7 +3,7 @@ import { Readability } from '@mozilla/readability';
 import { gfm } from 'turndown-plugin-gfm';
 import TurndownService from 'turndown';
 import { JSDOM, VirtualConsole } from 'jsdom';
-
+import { cleanMarkdownWithRemark } from './clearup';
 const turndownService = new TurndownService({
   headingStyle: 'atx',
   hr: '---',
@@ -98,7 +98,7 @@ function extract_from_dom(dom: JSDOM) {
   // replace weird header refs
   const pattern = /\[\]\(#[^)]*\)/g;
   res = res.replace(pattern, '')
-  return res
+  return cleanMarkdownWithRemark(res)
 }
 
 export async function extract_from_url(page: string) {
