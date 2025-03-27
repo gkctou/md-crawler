@@ -14,12 +14,15 @@
 
 ## 功能特點
 
-- 🚀 使用 Playwright 進行網頁爬取，支援現代網頁和動態內容
+- 🚀 使用 fetch 和 cheerio 進行高效網頁爬取，支援現代網頁
 - 📝 使用 Mozilla 的 Readability 演算法智慧提取主要內容
 - ✨ 自動轉換成結構化的 Markdown 格式，移除不必要的樣式和雜訊
 - 🎨 支援 GitHub Flavored Markdown (GFM)，保留重要的格式資訊
 - 💻 支援程式碼區塊的語法高亮，保持技術文件的可讀性
 - 🔗 自動遞迴爬取所有相關頁面，整合成單一檔案
+- 🧹 優化最小化依賴項，確保輕量化和快速運行
+- ⚡ 顯著提升處理速度，效能大幅優化
+- 📄 增強的 Markdown 輸出，格式更乾淨，連結處理更完善
 
 ## 資料整合優勢
 
@@ -50,16 +53,19 @@ npx markdown-crawler "https://example.com/my page" output
 工具會將所有相關頁面整合成結構化的 YAML 格式：
 ```yaml
 - title: "主頁標題"
+  url: "https://example.com/"
   content: |
     # 主頁內容
     這裡是主頁的正文...
 
 - title: "子頁面1標題"
+  url: "https://example.com/subpage1"
   content: |
     # 子頁面1內容
     這裡是子頁面1的正文...
 
 - title: "子頁面2標題"
+  url: "https://example.com/subpage2"
   content: |
     # 子頁面2內容
     這裡是子頁面2的正文...
@@ -67,9 +73,11 @@ npx markdown-crawler "https://example.com/my page" output
 
 特點：
 - 自動提取每個頁面的標題和主要內容
+- 包含每個頁面的原始 URL 以供參考
 - 保持內容的層級結構和格式
 - 移除不必要的樣式和腳本
-- 產生清晰易讀的 Markdown 格式
+- 生成乾淨、可讀的 Markdown，連結格式正確
+- 正確保留核取方塊和其他 Markdown 元素
 - 適合人類閱讀和 AI 模型處理
 
 ## 系統需求

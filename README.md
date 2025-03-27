@@ -14,12 +14,15 @@ A web crawler tool optimized for AI reading that converts web content into struc
 
 ## Features
 
-- 🚀 Uses Playwright for web crawling, supporting modern web pages and dynamic content
+- 🚀 Uses fetch and cheerio for efficient web crawling, supporting modern web pages
 - 📝 Uses Mozilla's Readability algorithm for intelligent content extraction
 - ✨ Automatically converts to structured Markdown format, removing unnecessary styles and noise
 - 🎨 Supports GitHub Flavored Markdown (GFM), preserving important formatting
 - 💻 Supports syntax highlighting for code blocks, maintaining technical document readability
 - 🔗 Automatically crawls all related pages, integrating them into a single file
+- 🧹 Optimized for minimal dependencies, ensuring lightweight and fast operation
+- ⚡ Significantly faster performance with optimized processing pipeline
+- 📄 Enhanced Markdown output with cleaner formatting and proper link handling
 
 ## Data Integration Benefits
 
@@ -50,16 +53,19 @@ npx markdown-crawler "https://example.com/my page" output
 The tool integrates all related pages into a structured YAML format:
 ```yaml
 - title: "Main Page Title"
+  url: "https://example.com/"
   content: |
     # Main Page Content
     Here is the main page content...
 
 - title: "Subpage 1 Title"
+  url: "https://example.com/subpage1"
   content: |
     # Subpage 1 Content
     Here is subpage 1 content...
 
 - title: "Subpage 2 Title"
+  url: "https://example.com/subpage2"
   content: |
     # Subpage 2 Content
     Here is subpage 2 content...
@@ -67,9 +73,11 @@ The tool integrates all related pages into a structured YAML format:
 
 Features:
 - Automatically extracts title and main content from each page
+- Includes the original URL for each page for reference
 - Maintains content hierarchy and formatting
 - Removes unnecessary styles and scripts
-- Generates clear and readable Markdown format
+- Generates clean, readable Markdown with proper link formatting
+- Preserves checkboxes and other Markdown elements correctly
 - Suitable for both human reading and AI model processing
 
 ## System Requirements
