@@ -1,6 +1,5 @@
-import { PlaywrightCrawler } from 'crawlee';// , Dataset
 import { extract_from_html } from './clipper';
-// import { rm, writeFileSync } from 'fs'
+import * as cheerio from 'cheerio';
 
 export interface IPage {
   title: string;
@@ -9,65 +8,188 @@ export interface IPage {
   html: string;
   at: number;
 }
-export async function crawl(url: string, additionalGlobalUrls: string[] = [],waiting: number = 0, headless: boolean = true,): Promise<IPage[]> {//output: any,
-  // PlaywrightCrawler crawls the web using a headless
-  // browser controlled by the Playwright library.
+
+export async function crawl(url: string, additionalGlobalUrls: string[] = [], waiting: number = 0, headless: boolean = true): Promise<IPage[]> {
   const pages: IPage[] = [];
-  const crawler = new PlaywrightCrawler({
-    // maxRequestsPerCrawl: 2,
-    launchContext: {
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
-    },
-    sessionPoolOptions: {
-      blockedStatusCodes: [401, 403, 429],
-    },
-    // Use the requestHandler to process each of the crawled pages.
-    async requestHandler({ request, page, response, enqueueLinks, log }) {
-      await page.waitForTimeout(waiting);
-      if (!await response?.ok()) {
-        log.error(`Got ${response?.status()} for ${request.loadedUrl}`)
-        return;
+  const visitedUrls = new Set<string>();
+  const urlsToVisit = [url];
+
+  // Custom user agent to mimic a browser
+  const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36';
+
+  console.log('additionalGlobalUrls:', additionalGlobalUrls);
+
+  while (urlsToVisit.length > 0) {
+    const currentUrl = urlsToVisit.shift();
+    
+    if (!currentUrl || visitedUrls.has(currentUrl)) {
+      continue;
+    }
+    
+    visitedUrls.add(currentUrl);
+    
+    try {
+      console.info(`Fetching ${currentUrl}`);
+      
+      // Add delay if specified
+      if (waiting > 0) {
+        await new Promise(resolve => setTimeout(resolve, waiting));
       }
-      const title = await page.title()
-
-      log.info(`Title of ${request.loadedUrl} is '${title}'`)
-
-      // scrape html
-      const html = await page.content()
-
-      // clip body
-      const clip = await extract_from_html(html)
-
-      // Save results as JSON to ./storage/datasets/default
-      // await Dataset.pushData({
-      //   title,
-      //   url: request.loadedUrl,
-      //   markdown: clip,
-      //   html: html,
-      //   at: Date.now(),
-      // })
-      pages.push({ title, url: request.loadedUrl, markdown: clip, html, at: Date.now() })
-      // Extract links from the current page
-      // and add them to the crawling queue.
-      await enqueueLinks({
-        globs: additionalGlobalUrls,
-      })
-    },
-    headless: headless,
-  })
-
-  // Add first URL to the queue and start the crawl.
-  await crawler.run([url])
-
-  // Open a named dataset
-  // const dataset = await Dataset.open("default");
-
-  // Export the dataset to a JSONL file
-  // writeFileSync(output, (await dataset.map((d) => JSON.stringify(d))).join('\n'))
-  // const data = await dataset.map(({ title, markdown }) => ({ title, markdown }));
-  // clean up and remove ./storage/datasets/default directory
-  // rm('storage', { recursive: true }, (err) => {
-  //   console.error(err)
-  // });
+      
+      // Fetch the page using native fetch
+      const response = await fetch(currentUrl, {
+        headers: {
+          'User-Agent': userAgent
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`Got ${response.status} for ${currentUrl}`);
+        continue;
+      }
+      
+      // Get the HTML content
+      const html = await response.text();
+      
+      // Use cheerio to parse HTML and extract information
+      const $ = cheerio.load(html);
+      
+      const [title, markdown] = await extract_from_html(html);
+      
+      // Save the page information
+      pages.push({
+        title,
+        url: currentUrl,
+        markdown,
+        html,
+        at: Date.now()
+      });
+      
+      // Extract links from the current page and add them to the queue
+      if (additionalGlobalUrls.length > 0) {
+        const links = $('a');
+        
+        links.each((_, element) => {
+          const href = $(element).attr('href');
+          if (!href) return;
+          
+          // Skip fragment-only links
+          if (href.startsWith('#')) return;
+          
+          // Skip mailto, tel, javascript links
+          if (href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+          
+          // Handle relative URLs
+          let fullUrl = href;
+          if (href.startsWith('/')) {
+            // Absolute path from domain root
+            const urlObj = new URL(currentUrl);
+            fullUrl = `${urlObj.origin}${href}`;
+          } else if (!href.startsWith('http')) {
+            // Relative path from current URL
+            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+            fullUrl = new URL(href, baseUrl).href;
+          }
+          
+          // Remove hash/fragment from URL to avoid crawling the same page multiple times
+          if (fullUrl.includes('#')) {
+            fullUrl = fullUrl.split('#')[0];
+          }
+          
+          // Skip URLs that are not http/https
+          if (!fullUrl.startsWith('http')) return;
+          
+          // Skip URLs that are already visited or in the queue
+          if (visitedUrls.has(fullUrl) || urlsToVisit.includes(fullUrl)) return;
+          
+          // Skip URLs from different domains if not explicitly allowed
+          const currentUrlDomain = new URL(currentUrl).hostname;
+          const fullUrlDomain = new URL(fullUrl).hostname;
+          if (currentUrlDomain !== fullUrlDomain) {
+            // Only allow external domains if explicitly matched by a pattern
+            let externalAllowed = false;
+            for (const pattern of additionalGlobalUrls) {
+              if (pattern.includes(fullUrlDomain)) {
+                externalAllowed = true;
+                break;
+              }
+            }
+            if (!externalAllowed) return;
+          }
+          
+          // Check if the URL matches any of the glob patterns
+          for (const pattern of additionalGlobalUrls) {
+            const isMatch = matchGlob(fullUrl, pattern);
+            
+            if (isMatch) {
+              console.log(`Enqueuing URL: ${fullUrl} (matched pattern: ${pattern})`);
+              urlsToVisit.push(fullUrl);
+              break;
+            }
+          }
+        });
+      }
+      
+    } catch (error) {
+      console.error(`Error processing ${currentUrl}:`, error);
+    }
+  }
+  
   return pages;
+}
+
+/**
+ * Match a URL against a glob pattern
+ * Supports * (any characters) and ** (any path segments)
+ */
+function matchGlob(url: string, pattern: string): boolean {
+  try {
+    // Basic case: exact match
+    if (url === pattern) return true;
+    
+    // Handle the case where the pattern is just a prefix
+    if (pattern.endsWith('/**/*')) {
+      const basePattern = pattern.slice(0, -5); // Remove '/**/*'
+      return url.startsWith(basePattern);
+    }
+    
+    // Handle the case where the pattern is a directory with all files
+    if (pattern.endsWith('/*')) {
+      const basePattern = pattern.slice(0, -2); // Remove '/*'
+      const urlObj = new URL(url);
+      const patternObj = new URL(basePattern);
+      
+      // Check if URL is in the same directory (no additional path segments)
+      return urlObj.origin === patternObj.origin && 
+             urlObj.pathname.startsWith(patternObj.pathname) &&
+             !urlObj.pathname.slice(patternObj.pathname.length).includes('/');
+    }
+    
+    // Convert the glob pattern to a regex pattern
+    let regexPattern = pattern
+      .replace(/\./g, '\\.')  // Escape dots
+      .replace(/\*\*/g, '__DOUBLE_STAR__')  // Temporarily replace ** with a placeholder
+      .replace(/\*/g, '[^/]*')  // Replace * with regex for "any characters except /"
+      .replace(/__DOUBLE_STAR__/g, '.*');  // Replace ** with regex for "any characters"
+      
+    // If the pattern ends with /**, make it match anything after the last /
+    if (pattern.endsWith('/**')) {
+      regexPattern = regexPattern.replace(/\/\.\*$/, '(\\/.*)?');
+    }
+    
+    // If the pattern ends with *, make it match anything
+    if (pattern.endsWith('*') && !pattern.endsWith('**')) {
+      regexPattern = regexPattern.replace(/\[\^\/\]\*$/, '.*');
+    }
+    
+    // Create the regex object with case-insensitive matching
+    const regex = new RegExp(`^${regexPattern}$`, 'i');
+    
+    // Test the URL against the regex
+    return regex.test(url);
+  } catch (error) {
+    console.error(`Error matching glob pattern ${pattern} against URL ${url}:`, error);
+    // Default to a simple prefix match if regex fails
+    return url.startsWith(pattern.replace('/**/*', ''));
+  }
 }

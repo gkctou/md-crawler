@@ -11,7 +11,7 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "test": "echo \"No tests specified yet\" && exit 0",
+    "test": "node dist/cli.js -- https://sample.site/docs/ sample.docs.yaml",
     "lint": "tsc --noEmit",
     "prepub": "npm version patch",
     "pub": "npm publish --access public"
@@ -58,21 +58,20 @@
     "node": ">=16.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.10.1",
-    "typescript": "^5.7.2"
+    "@types/node": "^22.13.14",
+    "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@mozilla/readability": "^0.5.0",
-    "commander": "^12.1.0",
-    "crawlee": "^3.12.0",
-    "jsdom": "^25.0.1",
-    "playwright": "^1.49.0",
+    "@mozilla/readability": "^0.6.0",
+    "cheerio": "^1.0.0",
+    "commander": "^13.1.0",
+    "jsdom": "^26.0.0",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "turndown": "^7.2.0",
     "turndown-plugin-gfm": "^1.0.2",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0",
-    "yaml": "^2.6.1"
+    "yaml": "^2.7.0"
   }
 }
