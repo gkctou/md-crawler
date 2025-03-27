@@ -153,7 +153,20 @@ function extract_from_dom(dom: JSDOM): [title: string, markdown: string] {
   // remove HTML comments
   article.content = article.content?.replace(/(\<!--.*?\-->)/g, "") || '';
 
-  // 不再处理标题和h1，保持原始内容结构
+  // 恢复标题处理功能
+  // Try to add proper h1 if title is missing
+  if (title.length > 0) {
+    // check if first h2 is the same as title
+    const h2Regex = /<h2[^>]*>(.*?)<\/h2>/;
+    const match = article.content.match(h2Regex);
+    if (match?.[0].includes(title)) {
+      // replace fist h2 with h1
+      article.content = article.content.replace("<h2", "<h1").replace("</h2", "</h1")
+    } else {
+      // add title as h1
+      article.content = `<h1>${title}</h1>\n${article.content}`
+    }
+  }
   
   // 重新处理HTML内容，确保链接格式正确
   const tempDom = new JSDOM(article.content);
