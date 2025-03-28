@@ -13,6 +13,15 @@ const turndownService = new TurndownService({
   codeBlockStyle: 'fenced',
   linkStyle: 'inlined',  // 使用内联链接样式
   linkReferenceStyle: 'full',  // 使用完整引用样式
+  blankReplacement: function (content, node) {
+    return node.isBlock ? '\n\n' : '';
+  },
+  keepReplacement: function (content, node) {
+    return node.isBlock ? '\n\n' + content + '\n\n' : content;
+  },
+  defaultReplacement: function (content, node) {
+    return node.isBlock ? '\n\n' + content + '\n\n' : content;
+  }
 });
 
 // 使用GitHub风格的Markdown扩展
@@ -79,6 +88,14 @@ turndownService.addRule('strikethrough', {
 
   replacement: function (content) {
     return '~' + content + '~';
+  }
+});
+
+// 自定义处理换行的规则
+turndownService.addRule('lineBreaks', {
+  filter: 'br',
+  replacement: function(content) {
+    return '\n';  // 使用单纯的换行符，不添加反斜杠
   }
 });
 
@@ -186,59 +203,18 @@ function extract_from_dom(dom: JSDOM): [title: string, markdown: string] {
   // convert to markdown
   let res = turndownService.turndown(article.content);
 
-  // // replace weird header refs
-  // const pattern = /\[\]\(#[^)]*\)/g;
-  // res = res.replace(pattern, '');
+  // 移除行尾多余的反斜杠（硬换行符号）
+  res = res.replace(/\\$/gm, '');
   
-  // // 修复任何可能仍然存在的转义问题
-  // res = res.replace(/\\\[/g, '[');
-  // res = res.replace(/\\\]/g, ']');
-  // res = res.replace(/\\\(/g, '(');
-  // res = res.replace(/\\\)/g, ')');
-  // res = res.replace(/\\_/g, '_');
-  // res = res.replace(/\\\*/g, '*');
+  // 处理日文文本中常见的段落格式
+  res = res.replace(/\\\s+/g, ' ');  // 移除反斜杠后跟空白
+  res = res.replace(/\\\n/g, '\n');  // 移除反斜杠后跟换行
   
-  // // 修复被错误转义的Markdown链接 - 覆盖所有可能的转义组合
-  // res = res.replace(/\\\[([^\]]+)\\\]\\\(([^)]+)\\\)/g, '[$1]($2)');
-  // res = res.replace(/\\\[([^\]]+)\\\]\\\(([^)]+)\)/g, '[$1]($2)');
-  // res = res.replace(/\\\[([^\]]+)\]\\\(([^)]+)\\\)/g, '[$1]($2)');
-  // res = res.replace(/\\\[([^\]]+)\]\\\(([^)]+)\)/g, '[$1]($2)');
-  // res = res.replace(/\[([^\]]+)\\\]\\\(([^)]+)\\\)/g, '[$1]($2)');
-  // res = res.replace(/\[([^\]]+)\\\]\\\(([^)]+)\)/g, '[$1]($2)');
-  // res = res.replace(/\[([^\]]+)\]\\\(([^)]+)\\\)/g, '[$1]($2)');
-  // res = res.replace(/\[([^\]]+)\]\\\(([^)]+)\)/g, '[$1]($2)');
+  // 清理多余的空行
+  res = res.replace(/\n{3,}/g, '\n\n');
   
-  // // 修复URL中的转义下划线
-  // res = res.replace(/\(([^)]*?)\\\_([^)]*?)\)/g, '($1_$2)');
-  
-  // // 特别处理空链接
-  // res = res.replace(/\[\]\(([^)]+)\)/g, '[$1]($1)');
-  
-  // // 处理多行链接文本 - 更全面的处理
-  // res = res.replace(/\[\s*\n\s*([^\]]+)\s*\n\s*\]\(([^)]+)\)/g, '[$1]($2)');
-  // res = res.replace(/\[([^\n\]]*)\n\s*([^\n\]]*)\]\(([^)]+)\)/g, '[$1 $2]($3)');
-  
-  // // 修复可能被错误处理的复选框
-  // res = res.replace(/- \\\[ \\\]/g, '- [ ]');
-  // res = res.replace(/- \\\[x\\\]/g, '- [x]');
-  // res = res.replace(/- \\\[ \]/g, '- [ ]');
-  // res = res.replace(/- \\\[x\]/g, '- [x]');
-  // res = res.replace(/- \[ \\\]/g, '- [ ]');
-  // res = res.replace(/- \[x\\\]/g, '- [x]');
-  
-  // // 修复导航链接中的格式问题
-  // res = res.replace(/- - \\\[/g, '- - [');
-  // res = res.replace(/\]\\\(/g, '](');
-  
-  // // 修复特殊的导航链接格式
-  // res = res.replace(/- - \[(.*?)\]\((.*?)\)\n\s*- \\(.*?)\n\s*\]\((.*?)\)/gm, '- - [$1]($2)\n      - [$3]($4)');
-  
-  // // 修复Instagram API文档中的特殊链接格式
-  // res = res.replace(/\\\[##\s+(.*?)\n\s*(.*?)\n\s*(.*?)\n\s*(.*?)\n\s*(.*?)\n\s*(.*?)\n\s*(.*?)\n\s*(.*?)\n\s*\]\(([^)]+)\)/gm, 
-  //                  '## $1\n\n$2\n\n$3\n\n$4\n\n$5\n\n$6\n\n$7\n\n$8\n\n$9\n\n[$1]($10)');
-  
-  // // 修复about:链接
-  // res = res.replace(/\(about:\/([^)]+)\)/g, '(https://$1)');
+  // 特别处理日文文本中的格式
+  res = res.replace(/【(.+?)】\\\s*/g, '【$1】\n');
   
   return [title, cleanMarkdownWithRemark(res)]
 }
