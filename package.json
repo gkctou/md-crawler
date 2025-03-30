@@ -63,9 +63,11 @@
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
+    "@types/minimatch": "^5.1.2",
     "cheerio": "^1.0.0",
     "commander": "^13.1.0",
     "jsdom": "^26.0.0",
+    "minimatch": "^10.0.1",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "turndown": "^7.2.0",

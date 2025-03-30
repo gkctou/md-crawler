@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { crawl } from './crawler';
-import { extract_from_url} from './clipper';
 import yaml from 'yaml';
 import fs from 'fs';
 import path from 'path';
@@ -13,17 +12,12 @@ program
   .description('Crawl web pages and convert to YAML format Markdown. Will recursively crawl all pages in subdirectories.')
   .argument('<url>', 'URL to crawl. For URLs containing spaces, wrap them in double quotes: "http://example.com/my page"')
   .argument('<output>', 'Output YAML file name. Will be saved in the current working directory.')
-  .argument('[waiting]', 'Optional: Waiting time in milliseconds. Default is 0 milliseconds. If you get nothing for some SPA web pages, recommended to set a waiting time about 500 milliseconds.')
-  .action(async (url: string, output: string, waiting?: string) => {
+  .action(async (url: string, output: string) => {
     try {
-      const waitingTime = parseInt(waiting || '0');
-      if (isNaN(waitingTime)) {
-        throw new Error('Waiting time must be a number.');
-      }
       console.log('Starting web crawl...');
       const additionalGlobalUrls = [url.endsWith('/') ? `${url}**/*` : `${url.substring(0, url.lastIndexOf('/'))}/**/*`];
 
-      const results = await crawl(url, additionalGlobalUrls, waitingTime);
+      const results = await crawl(url, additionalGlobalUrls);
 
       console.log('Converting format...');
       
@@ -47,30 +41,30 @@ program
       });
 
       // 后处理YAML字符串，移除内容中不必要的反斜杠
-      const processedYamlString = yamlString
-        // 保留YAML结构，但移除内容中的反斜杠+换行符组合
-        .replace(/(\s*content: \|[\r\n]+)([^]*?)(?=\n\s*-|\n\s*$)/g, (match, prefix, content) => {
-          // 只处理content部分，保留前缀
-          const processedContent = content
-            // 移除反斜杠+换行符组合，但保留实际换行
-            .replace(/\\(\r?\n\s*)/g, '$1')
-            // 修复URL中的反斜杠
-            .replace(/\\\&/g, '&')
-            // 移除链接中的反斜杠
-            .replace(/\\\[/g, '[')
-            .replace(/\\\]/g, ']')
-            .replace(/\\\(/g, '(')
-            .replace(/\\\)/g, ')')
-            // 保留Markdown代码块中的反斜杠
-            .replace(/```([^`]*?)```/g, (codeMatch) => codeMatch.replace(/\\\\/g, '\\\\'));
+      // const processedYamlString = yamlString
+      //   // 保留YAML结构，但移除内容中的反斜杠+换行符组合
+      //   .replace(/(\s*content: \|[\r\n]+)([^]*?)(?=\n\s*-|\n\s*$)/g, (match, prefix, content) => {
+      //     // 只处理content部分，保留前缀
+      //     const processedContent = content
+      //       // 移除反斜杠+换行符组合，但保留实际换行
+      //       .replace(/\\(\r?\n\s*)/g, '$1')
+      //       // 修复URL中的反斜杠
+      //       .replace(/\\\&/g, '&')
+      //       // 移除链接中的反斜杠
+      //       .replace(/\\\[/g, '[')
+      //       .replace(/\\\]/g, ']')
+      //       .replace(/\\\(/g, '(')
+      //       .replace(/\\\)/g, ')')
+      //       // 保留Markdown代码块中的反斜杠
+      //       .replace(/```([^`]*?)```/g, (codeMatch) => codeMatch.replace(/\\\\/g, '\\\\'));
           
-          return prefix + processedContent;
-        });
+      //     return prefix + processedContent;
+      //   });
 
       // Check and ensure file path ends with .yaml
       const outputWithExt = output.endsWith('.yaml') ? output : `${output}.yaml`;
       const outputPath = path.resolve(process.cwd(), outputWithExt);
-      fs.writeFileSync(outputPath, processedYamlString);
+      fs.writeFileSync(outputPath, yamlString);
 
       console.log(`Success! Results saved to: ${outputPath}`);
     } catch (error) {
