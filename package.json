@@ -1,6 +1,6 @@
 {
   "name": "markdown-crawler",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "A powerful web crawler that extracts content from web pages and converts them to clean Markdown format, with support for code blocks and GitHub Flavored Markdown",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -64,7 +64,6 @@
       "require": "./dist/cjs/index.js"
     }
   },
-
   "homepage": "https://github.com/gkctou/md-crawler#readme",
   "engines": {
     "node": ">=16.0.0"
