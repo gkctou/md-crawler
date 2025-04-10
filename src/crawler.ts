@@ -1,6 +1,6 @@
-import { extract_from_html } from './clipper';
-import * as cheerio from 'cheerio';
+import { extract_from_html } from './clipper.js';
 import { minimatch } from 'minimatch';
+import * as cheerio from 'cheerio'; // Added cheerio import
 
 export interface IPage {
   title: string;

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { crawl } from './crawler';
-import yaml from 'yaml';
+import { crawl } from './crawler.js';
+import * as yaml from 'yaml'; // Changed import style
 import fs from 'fs';
 import path from 'path';
 

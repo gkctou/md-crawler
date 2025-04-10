@@ -2,22 +2,27 @@
   "name": "markdown-crawler",
   "version": "1.0.17",
   "description": "A powerful web crawler that extracts content from web pages and converts them to clean Markdown format, with support for code blocks and GitHub Flavored Markdown",
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "bin": {
-    "markdown-crawler": "dist/cli.js"
+    "markdown-crawler": "./dist/esm/cli.js"
   },
   "scripts": {
-    "build": "tsc && chmod +x ./dist/cli.js",
-    "dev": "tsc --watch",
+    "build": "npm run clean && npx tsc -p tsconfig.json && npx tsc -p tsconfig.cjs.json && chmod +x ./dist/esm/cli.js",
+    "dev": "npx tsc --watch",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "test": "node dist/cli.js -- https://sample.site/docs/ sample.docs.yaml",
-    "lint": "tsc --noEmit",
+    "test": "node dist/esm/cli.js -- https://sample.site/docs/ sample.docs.yaml",
+    "lint": "npx tsc --noEmit",
     "prepub": "npm version patch",
     "pub": "npm publish --access public"
   },
   "files": [
-    "dist",
+    "dist/esm",
+    "dist/cjs",
+    "dist/types",
     "README.md",
     "README-*.md",
     "LICENSE"
@@ -53,6 +58,13 @@
   "bugs": {
     "url": "https://github.com/gkctou/md-crawler/issues"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+
   "homepage": "https://github.com/gkctou/md-crawler#readme",
   "engines": {
     "node": ">=16.0.0"

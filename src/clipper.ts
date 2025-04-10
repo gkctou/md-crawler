@@ -1,9 +1,9 @@
 import { Readability } from '@mozilla/readability';
-// @ts-ignore
-import { gfm } from 'turndown-plugin-gfm';
+import { JSDOM, VirtualConsole } from 'jsdom'; // Added VirtualConsole import
 import TurndownService from 'turndown';
-import { JSDOM, VirtualConsole } from 'jsdom';
-import { cleanMarkdownWithRemark } from './clearup';
+import { gfm } from 'turndown-plugin-gfm';
+import { cleanMarkdownWithRemark } from './clearup.js';
+import * as cheerio from 'cheerio';
 
 // 配置TurndownService
 const turndownService = new TurndownService({

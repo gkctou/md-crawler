@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node", // Override moduleResolution to be compatible with CommonJS
+    "outDir": "./dist/cjs",
+    "declaration": false, // Disable declaration files for CJS build
+    "declarationDir": null, // Override inherited declarationDir
+    "noEmit": false // Explicitly ensure output is enabled
+  }
+}

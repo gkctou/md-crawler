@@ -1,14 +1,18 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "commonjs",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./dist/esm", // Changed output directory
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitAny": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "noEmit": false // Explicitly ensure output is enabled
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
